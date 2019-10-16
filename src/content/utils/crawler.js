@@ -1,14 +1,16 @@
 /* eslint-disable */
 // 爬虫
-import url from 'url'
 import $ from 'jquery'
-import { isGithub } from './is'
+import {
+  isGithub
+} from './is'
 
 export default function () {
 
-  function split (text, s = ': ') {
+  function split(text, s = ': ') {
+
     const arr = text.split(s)
-    const [ first, ...second ] = arr
+    const [first, ...second] = arr
     return [
       first,
       second.join(s)
@@ -16,7 +18,7 @@ export default function () {
   }
 
   // 如果是 github 项目地址，检查语言类型
-  function getGithubInfo () {
+  function getGithubInfo() {
 
     if (isGithub()) {
       const doms = $('.pagehead-actions').eq(0).children()
@@ -32,11 +34,12 @@ export default function () {
       githubInfo.fork = doms.eq(doms.length - 1).find('a.social-count').html().trim().replace(',', '')
     }
   }
+  // 网站名称
+  let name = document.title
+  // 网站描述
+  let describe = document.title
 
-  const parsedUrl = url.parse(location.href, true)
-
-  let title = document.title
-  let description = document.title
+  console.log('name', name)
   // 如果是 github 开源仓库 获取 github 的数据
   let githubInfo = {
     lang: '',
@@ -46,36 +49,38 @@ export default function () {
     fork: null
   }
 
-  switch (parsedUrl.host) {
+  switch (document.location.host) {
     case 'github.com': {
-      title = split(document.title)[0]
-      description = split(document.title)[1]
+      name = split(document.title)[0]
+      describe = split(document.title)[1]
       getGithubInfo()
-    }; break;
-    case 'juejin.im': {
-      title = split(document.title, ' - ')[0]
-      description = split(document.title, ' - ')[1]
-    }; break;
-    case 'mp.weixin.qq.com': {
-      title = document.querySelector('#activity-name').innerText
-    }; break;
-    case 'uimovement.com': {
-      title = split(document.title, ' - ')[0]
-      description = split(document.title, ' - ')[1]
-    }; break;
-    default: break;
+    };
+    break;
+  case 'juejin.im': {
+    name = split(document.title, ' - ')[0]
+    describe = split(document.title, ' - ')[1]
+  };
+  break;
+  case 'mp.weixin.qq.com': {
+    name = document.querySelector('#activity-name').innerText
+  };
+  break;
+  case 'uimovement.com': {
+    name = split(document.title, ' - ')[0]
+    describe = split(document.title, ' - ')[1]
+  };
+  break;
+  default:
+    break;
   }
   // 保底
-  title = title || location.href
-  description = description || title
+  name = name || location.href
+  describe = describe || title
   // 返回数据
   return {
-    title,
-    description,
-    url: location.href,
+    name,
+    describe,
+    website: location.href,
     ...githubInfo,
-    isChinese: true,
-    video: false,
-    vpn: false
   }
 }

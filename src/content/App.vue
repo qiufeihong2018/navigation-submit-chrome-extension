@@ -52,6 +52,7 @@ export default {
   data () {
     return {
       dialogVisible: false,
+      // 提交表单
       ruleForm: {
         name: '',
         category: '',
@@ -60,6 +61,7 @@ export default {
         logo: '',
         way: 'add'
       },
+      // 校验
       rules: {
         name: [{
           required: true,
@@ -77,6 +79,7 @@ export default {
           trigger: 'blur'
         }]
       },
+      // 网站种类
       categoryOptions: [{
         'value': 'recommendationFront-end',
         'label': '前端-热门推荐'
@@ -310,20 +313,15 @@ export default {
        * 接收消息
        */
     onMessage ({
-      action,
-      category
+      action
     }) {
       const data = {
         // 页面信息
         ...crawler(),
-        // 类型
-        category,
-        // api 需要
-        source: 'd2',
-        device: 'chrome'
+        way: 'add'
       }
-
-      this.form = data
+      console.log(data)
+      this.ruleForm = data
 
       this.dialogVisible = true
     }

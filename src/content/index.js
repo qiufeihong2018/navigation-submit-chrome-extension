@@ -8,7 +8,6 @@ import {
   Form,
   FormItem,
   Input,
-  Checkbox,
   Select,
   Option
 } from 'element-ui'
@@ -18,7 +17,6 @@ Vue.use(Dialog)
 Vue.use(Form)
 Vue.use(FormItem)
 Vue.use(Input)
-Vue.use(Checkbox)
 Vue.use(Select)
 Vue.use(Option)
 

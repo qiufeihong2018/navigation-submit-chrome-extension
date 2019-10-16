@@ -23,14 +23,14 @@
 </template>
 
 <script>
-  export default {
-    name: 'app',
-    data() {
-      return {
-        value: new Date()
-      }
-    },
+export default {
+  name: 'app',
+  data () {
+    return {
+      value: new Date()
+    }
   }
+}
 </script>
 
 <style lang="scss">
