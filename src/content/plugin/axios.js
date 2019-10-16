@@ -1,13 +1,14 @@
 import axios from 'axios'
 
 export default axios.create({
-  baseURL: 'https://hellogithub.com',
+  baseURL: 'http://navigation.qiufeihong.top',
   timeout: 5000,
   headers: {
-    'Content-Type': 'application/json'
-  },
-  auth: {
-    username: 'd2-awesome',
-    password: 'bsXms5RrbOjOT1OdUYS96WKU+AJ4P2o1'
+    'Content-Type': 'application/json',
+    'X-Token': 'admin'
   }
+  // auth: {
+  //   username: 'd2-awesome',
+  //   password: 'bsXms5RrbOjOT1OdUYS96WKU+AJ4P2o1'
+  // }
 })

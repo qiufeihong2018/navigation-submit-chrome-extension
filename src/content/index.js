@@ -2,14 +2,25 @@
 import Vue from 'vue'
 import './utils/insert-element-icons'
 import App from './App.vue'
-import { Button, Dialog, Form, FormItem, Input, Checkbox } from 'element-ui'
+import {
+  Button,
+  Dialog,
+  Form,
+  FormItem,
+  Input,
+  Checkbox,
+  Select,
+  Option
+} from 'element-ui'
 
-Vue.component(Button.name, Button)
-Vue.component(Dialog.name, Dialog)
-Vue.component(Form.name, Form)
-Vue.component(FormItem.name, FormItem)
-Vue.component(Input.name, Input)
-Vue.component(Checkbox.name, Checkbox)
+Vue.use(Button)
+Vue.use(Dialog)
+Vue.use(Form)
+Vue.use(FormItem)
+Vue.use(Input)
+Vue.use(Checkbox)
+Vue.use(Select)
+Vue.use(Option)
 
 const AppConstructor = Vue.extend(App)
 const instance = new AppConstructor()
