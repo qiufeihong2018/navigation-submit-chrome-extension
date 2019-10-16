@@ -1,12 +1,12 @@
 <template>
   <div class="main_app">
-    <h1>欢迎使用日报提交工具</h1>
+    <h1>欢迎使用 Navigation 提交工具</h1>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'app',
+  name: 'app'
 }
 </script>
 

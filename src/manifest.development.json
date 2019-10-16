@@ -1,17 +1,17 @@
 {
-    "name": "推荐到日报",
-    "version": "1.2.4",
+    "name": "推荐到Navigation",
+    "version": "1.0.0",
     "manifest_version": 2,
-    "description": "向更多人的分享你的发现",
+    "description": "为程序员、设计师、产品经理等等收藏和导航优质网站。",
     "icons": { 
-      "16": "image/icon/16@2x.png",
-      "48": "image/icon/48@2x.png",
-      "128": "image/icon/128@2x.png"
+      "16": "image/icon/navigation.png",
+      "48": "image/icon/navigation.png",
+      "128": "image/icon/navigation.png"
     },
     "options_page": "options.html",
     "browser_action": {
-        "default_icon": "image/icon/browser_action@2x.png",
-        "default_title": "日报提交助手",
+        "default_icon": "image/icon/navigation.png",
+        "default_title": "Navigation提交助手",
         "default_popup": "popup.html"
     },
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'; style-src 'self';",

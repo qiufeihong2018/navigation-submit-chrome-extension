@@ -1,13 +1,7 @@
 /* eslint-disable */
 
 const menus = [
-  '新闻',
-  '开源项目',
-  '分享',
-  '题目',
-  '网站',
-  '工具',
-  '设计'
+  '推荐到Navigation'
 ]
 
 menus.forEach((menu, index) => {
