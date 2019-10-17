@@ -6,10 +6,22 @@ import {
 } from './is'
 
 export default function () {
-
-  function split(text, s = ': ') {
-
-    const arr = text.split(s)
+  // 网站名称
+  let name = document.title
+  // 网站描述
+  let describe = document.title
+  // console.log('name', name)
+  // 如果是 github 开源仓库 获取 github 的数据
+  let githubInfo = {
+    lang: '',
+    langPrimary: '',
+    watch: null,
+    star: null,
+    fork: null
+  }
+  // 分割题目和描述
+  function split(data, s = ': ') {
+    const arr = data.split(s)
     const [first, ...second] = arr
     return [
       first,
@@ -34,20 +46,7 @@ export default function () {
       githubInfo.fork = doms.eq(doms.length - 1).find('a.social-count').html().trim().replace(',', '')
     }
   }
-  // 网站名称
-  let name = document.title
-  // 网站描述
-  let describe = document.title
 
-  console.log('name', name)
-  // 如果是 github 开源仓库 获取 github 的数据
-  let githubInfo = {
-    lang: '',
-    langPrimary: '',
-    watch: null,
-    star: null,
-    fork: null
-  }
 
   switch (document.location.host) {
     case 'github.com': {
@@ -73,9 +72,7 @@ export default function () {
   default:
     break;
   }
-  // 保底
-  name = name || location.href
-  describe = describe || title
+
   // 返回数据
   return {
     name,
