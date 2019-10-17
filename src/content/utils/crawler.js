@@ -53,8 +53,14 @@ export default function () {
       name = split(document.title)[0]
       describe = split(document.title)[1]
       getGithubInfo()
+      // 返回数据
+      return {
+        name,
+        describe,
+        website: document.location.href,
+        ...githubInfo
+      }
     };
-    break;
   case 'juejin.im': {
     name = split(document.title, ' - ')[0]
     describe = split(document.title, ' - ')[1]
@@ -77,7 +83,6 @@ export default function () {
   return {
     name,
     describe,
-    website: location.href,
-    ...githubInfo,
+    website: document.location.href
   }
 }

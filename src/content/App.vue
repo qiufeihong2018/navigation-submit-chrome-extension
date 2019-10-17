@@ -31,118 +31,179 @@
 </template>
 
 <script>
-  // 爬虫
-  import crawler from './utils/crawler'
-  // 前后端通信
-  import service from './plugin/axios'
-  // 网站种类
-  import * as categoryOptions from './categoryOptions'
-  // 导入局部notification，防止全局出现的bug
-  import {
-    Notification
-  } from 'element-ui'
-  export default {
-    name: 'app',
-    data() {
-      return {
-        dialogVisible: false,
-        // 提交表单
-        ruleForm: {
-          name: '',
-          category: '',
-          website: '',
-          describe: '',
-          logo: '',
-          way: 'add'
-        },
-        // 校验
-        rules: {
-          name: [{
-            required: true,
-            message: '请输入网站名称',
-            trigger: 'blur'
-          }],
-          category: [{
-            required: true,
-            message: '请选择网站分类',
-            trigger: 'change'
-          }],
-          website: [{
-            required: true,
-            message: '请输入网站链接',
-            trigger: 'blur'
-          }]
-        },
-        categoryOptions
-      }
-    },
-    methods: {
-      /**
-       * 关闭弹框
-       */
-      close(formName) {
-        this.$refs[formName].resetFields()
-        this.dialogVisible = false
+// 爬虫
+import crawler from './utils/crawler'
+// 前后端通信
+import service from './plugin/axios'
+// 网站种类
+import * as categoryOptions from './categoryOptions'
+// 截图
+// https://github.com/niklasvh/html2canvas
+import html2canvas from 'html2canvas'
+// 存储对象
+import OSS from 'ali-oss'
+// 导入局部notification，防止全局出现的bug
+import {
+  Notification
+} from 'element-ui'
+export default {
+  name: 'app',
+  data () {
+    return {
+      dialogVisible: false,
+      // 提交表单
+      ruleForm: {},
+      // 校验
+      rules: {
+        name: [{
+          required: true,
+          message: '请输入网站名称',
+          trigger: 'blur'
+        }],
+        category: [{
+          required: true,
+          message: '请选择网站分类',
+          trigger: 'change'
+        }],
+        website: [{
+          required: true,
+          message: '请输入网站链接',
+          trigger: 'blur'
+        }]
       },
-      /**
-       * @description 提交登录信息
-       */
-      submitForm(formName) {
-        this.$refs[formName].validate(async valid => {
-          if (valid) {
-            if (this.ruleForm.logo === '') {
-              this.ruleForm.logo = 'http://navigation.qiufeihong.top/favicon.ico'
-            }
-            service({
-                url: '/api/v1/admin/',
-                method: 'post',
-                data: this.ruleForm
-              })
-              .then(res => {
-                if (res.data.state === 'ok') {
-                  Notification.success({
-                    title: '成功',
-                    message: `提交网站《${this.ruleForm.name}》成功`
-                  })
-                } else {
-                  Notification.error({
-                    title: '失败',
-                    message: `提交网站《${this.ruleForm.name}》失败-${res.data.message}`
-                  })
-                }
-              })
-          } else {
-            Notification.error({
-              title: '表单校验失败',
-              message: '请填上必填信息'
-            })
-          }
-        })
-      },
-      /**
-       * 重置数据
-       */
-      resetForm(formName) {
-        this.$refs[formName].resetFields()
-      },
-      /**
+      categoryOptions
+    }
+  },
+  methods: {
+    /**
        * 接收消息
        */
-      onMessage({
-        action
-      }) {
-        const data = {
-          // 页面信息
-          ...crawler(),
-          way: 'add'
-        }
-        // console.log(data)
-        this.ruleForm = data
-
-        this.dialogVisible = true
+    onMessage ({
+      action
+    }) {
+      const data = {
+        // 页面信息
+        ...crawler(),
+        way: 'add',
+        category: '',
+        logo: ''
       }
+      this.ruleForm = data
+      // this.getPicture()
+      this.dialogVisible = true
+    },
+    /**
+       * 关闭弹框
+       */
+    close (formName) {
+      this.$refs[formName].resetFields()
+      this.dialogVisible = false
+    },
+    // /**
+    //    * 截取网站首屏,存储阿里云OSS
+    //    *    https://ask.csdn.net/questions/674754
+    //    */
+    // getPicture () {
+    //   html2canvas(document.body).then(canvas => {
+    //     // document.body.appendChild(canvas);
+    //     const dataUrl = canvas.toDataURL('image/png')
+    //     // 1. 将dataUrl转化为Blob
+    //     const blob = this.base64ToBlob(dataUrl)
+    //     // console.log(blob)
+    //     // 2. 上传到oss
+    //     this.uploadShareImg(blob)
+    //   })
+    // },
+    // // base64转换成blob数据
+    // base64ToBlob (dataUrl, type) {
+    //   var arr = dataUrl.split(',')
+    //   var mime = arr[0].match(/:(.*?);/)[1] || type
+    //   // 去掉url的头，并转化为byte
+    //   var bytes = window.atob(arr[1])
+    //   // 处理异常,将ascii码小于0的转换为大于0
+    //   var ab = new ArrayBuffer(bytes.length)
+    //   // 生成视图（直接针对内存）：8位无符号整数，长度1个字节
+    //   var ia = new Uint8Array(ab)
+    //   for (var i = 0; i < bytes.length; i++) {
+    //     ia[i] = bytes.charCodeAt(i)
+    //   }
+    //   return new Blob([ab], {
+    //     type: mime
+    //   })
+    // },
+    // // 上传Blob二进制数据
+    // uploadBlob (fileName, blob) {
+    //   return new Promise((resolve, reject) => {
+    //     let ossClient = new OSS({
+    //       region: 'navigation-html2canvas.oss-cn-hangzhou.aliyuncs.com',
+    //       // 云账号AccessKey有所有API访问权限，建议遵循阿里云安全最佳实践，部署在服务端使用RAM子账号或STS，部署在客户端使用STS。
+    //       accessKeyId: 'LTAI4FwUEemm2DtdGVzyMft7',
+    //       accessKeySecret: 'ALm9YYpBohSWdBBhTdA9UPBmjYkSxV',
+    //       bucket: 'navigation-html2canvas'
+    //     })
+    //     async function putBlob () {
+    //       try {
+    //         console.log('ossClient',ossClient)
+    //         let result = await ossClient.put(fileName, blob)
+    //         console.log('result',result)
+    //         // result.imgUrl = `${CDN_IMAGE_DOMAIN}/${result.name}`;
+    //         resolve(result)
+    //       } catch (e) {
+    //         reject(e)
+    //       }
+    //     }
+    //     putBlob()
+    //   })
+    // },
+    // // 上传分享大图
+    // uploadShareImg (blob) {
+    //   const fileName = `logo/${this.ruleForm.name}-${Math.round(new Date().getTime() / 1000)}.jpg`
+    //   // console.log(fileName)
+    //   this.uploadBlob(fileName, blob).then(res => {
+    //     this.ruleForm.logo = res.imgUrl
+    //   })
+    // },
+    /**
+       * @description 提交登录信息
+       */
+    submitForm (formName) {
+      // console.log(this.ruleForm)
+      this.$refs[formName].validate(async valid => {
+        if (valid) {
+          service({
+            url: '/api/v1/admin/',
+            method: 'post',
+            data: this.ruleForm
+          })
+            .then(res => {
+              if (res.data.state === 'ok') {
+                Notification.success({
+                  title: '成功',
+                  message: `提交网站《${this.ruleForm.name}》成功`
+                })
+              } else {
+                Notification.error({
+                  title: '失败',
+                  message: `提交网站《${this.ruleForm.name}》失败-${res.data.message}`
+                })
+              }
+            })
+        } else {
+          Notification.error({
+            title: '表单校验失败',
+            message: '请填上必填信息'
+          })
+        }
+      })
+    },
+    /**
+       * 重置数据
+       */
+    resetForm (formName) {
+      this.$refs[formName].resetFields()
     }
   }
+}
 </script>
 <style lang="scss">
   .btn-container {
