@@ -44,6 +44,7 @@
   // 存储对象
   import OSS from 'ali-oss'
   // 导入局部notification，防止全局出现的bug
+  import CryptoJS from 'crypto-js'
   import {
     Notification
   } from 'element-ui'
@@ -123,6 +124,73 @@
           // this.uploadShareImg(blob)
         })
       },
+      base64encode(str) {
+        var base64EncodeChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+        var out, i, len;
+        var c1, c2, c3;
+        len = str.length;
+        i = 0;
+        out = "";
+        while (i < len) {
+          c1 = str.charCodeAt(i++) & 0xff;
+          if (i == len) {
+            out += base64EncodeChars.charAt(c1 >> 2);
+            out += base64EncodeChars.charAt((c1 & 0x3) << 4);
+            out += "==";
+            break;
+          }
+          c2 = str.charCodeAt(i++);
+          if (i == len) {
+            out += base64EncodeChars.charAt(c1 >> 2);
+            out += base64EncodeChars.charAt(((c1 & 0x3) << 4) | ((c2 & 0xF0) >> 4));
+            out += base64EncodeChars.charAt((c2 & 0xF) << 2);
+            out += "=";
+            break;
+          }
+          c3 = str.charCodeAt(i++);
+          out += base64EncodeChars.charAt(c1 >> 2);
+          out += base64EncodeChars.charAt(((c1 & 0x3) << 4) | ((c2 & 0xF0) >> 4));
+          out += base64EncodeChars.charAt(((c2 & 0xF) << 2) | ((c3 & 0xC0) >> 6));
+          out += base64EncodeChars.charAt(c3 & 0x3F);
+        }
+        return out;
+      },
+      /* utf.js - UTF-8 <=> UTF-16 convertion
+       *
+       * Copyright (C) 1999 Masanao Izumo <iz@onicos.co.jp>
+       * Version: 1.0
+       * LastModified: Dec 25 1999
+       * This library is free. You can redistribute it and/or modify it.
+       */
+      /*
+       * Interfaces:
+       * utf8 = utf16to8(utf16);
+       * utf16 = utf8to16(utf8);
+       */
+      utf16to8(str) {
+        var out, i, len, c;
+        out = "";
+        len = str.length;
+        for (i = 0; i < len; i++) {
+          c = str.charCodeAt(i);
+          if ((c >= 0x0001) && (c <= 0x007F)) {
+            out += str.charAt(i);
+          } else if (c > 0x07FF) {
+            out += String.fromCharCode(0xE0 | ((c >> 12) & 0x0F));
+            out += String.fromCharCode(0x80 | ((c >> 6) & 0x3F));
+            out += String.fromCharCode(0x80 | ((c >> 0) & 0x3F));
+          } else {
+            out += String.fromCharCode(0xC0 | ((c >> 6) & 0x1F));
+            out += String.fromCharCode(0x80 | ((c >> 0) & 0x3F));
+          }
+        }
+        return out;
+      },
+      safe64(base64) {
+        base64 = base64.replace(/\+/g, "-");
+        base64 = base64.replace(/\//g, "_");
+        return base64;
+      },
       // http://jsfiddle.net/gh/get/extjs/4.2/icattlecoder/jsfiddle/tree/master/uptoken
       genUpToken(accessKey, secretKey, putPolicy) {
         // 1.构造上传策略：
@@ -131,7 +199,7 @@
         console && console.log("put_policy = ", put_policy);
 
         //SETP 3.对 JSON 编码的上传策略进行URL 安全的 Base64 编码，得到待签名字符串：
-        var encoded = base64encode(utf16to8(put_policy));
+        var encoded = this.base64encode(this.utf16to8(put_policy));
         console && console.log("encoded = ", encoded);
 
         //SETP 4.使用访问密钥（AK/SK）对上一步生成的待签名字符串计算HMAC-SHA1签名：
@@ -140,24 +208,26 @@
         console && console.log("encoded_signed=", encoded_signed)
 
         //SETP 5.对签名进行URL安全的Base64编码：
-        var upload_token = accessKey + ":" + safe64(encoded_signed) + ":" + encoded;
+        var upload_token = accessKey + ":" + this.safe64(encoded_signed) + ":" + encoded;
         console && console.log("upload_token=", upload_token)
         return upload_token;
       },
-      putb64(url) {
-        var pic = url;
-        var url = "http://upload.qiniup.com/putb64/20264"; //非华东空间需要根据注意事项 1 修改上传域名
+      putb64(pic) {
+        var url = "https://upload.qiniup.com/putb64/-1"; //非华东空间需要根据注意事项 1 修改上传域名
         var xhr = new XMLHttpRequest();
-        // https://www.w3school.com.cn/ajax/ajax_xmlhttprequest_onreadystatechange.asp
         xhr.onreadystatechange = function () {
           if (xhr.readyState == 4) {
-            document.getElementById("myDiv").innerHTML = xhr.responseText;
+            console.log('responseText', xhr.responseText)
+            console.log('ruleForm', this.ruleForm)
+            // this.ruleForm.logo = xhr.responseText;
           }
         }
+        // https://www.w3school.com.cn/ajax/ajax_xmlhttprequest_onreadystatechange.asp
         xhr.open("POST", url, true);
         xhr.setRequestHeader("Content-Type", "application/octet-stream");
-        xhr.setRequestHeader("Authorization", this.genUpToken(this.tokenParams.accessKey, this.tokenParams.secretKey,
-          this.tokenParams.putPolicy));
+        // xhr.setRequestHeader("Authorization", this.genUpToken(this.tokenParams.accessKey, this.tokenParams.secretKey,
+          // this.tokenParams.putPolicy));
+        xhr.setRequestHeader("Authorization", 'vNBgV03wzBamr-cuCPnzR9YCbRnDnG8q4_Zu09W1:aeD8jxzBQVzfeGh7SmEL70SuJJA=:eyJzY29wZSI6InFpdWZlaWhvbmciLCJkZWFkbGluZSI6MTU3MTgxODI0NX0=');
         xhr.send(pic);
       },
       // // base64转换成blob数据
