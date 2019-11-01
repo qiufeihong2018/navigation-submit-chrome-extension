@@ -175,4 +175,10 @@ module.exports = [{
 }, {
   'value': 'gameSystem',
   'label': '极客-游戏系统'
+}, {
+  'value': 'webGovernment',
+  'label': '生活-政府网站'
+}, {
+  'value': 'freeVideo',
+  'label': '生活-免费影视'
 }]
