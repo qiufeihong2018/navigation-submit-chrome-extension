@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import AppComponent from './App.vue'
+import App from './App.vue'
 
 import {
   Card,
@@ -7,7 +7,7 @@ import {
   Button
 } from 'element-ui'
 
-Vue.component('app-component', AppComponent)
+Vue.component('app-component', App)
 
 Vue.use(Card)
 Vue.use(Calendar)
@@ -16,7 +16,7 @@ Vue.use(Button)
 // eslint-disable-next-line
 new Vue({
   el: '#app',
-  render: createElement => {
-    return createElement(AppComponent)
+  render: h => {
+    return h(App)
   }
 })
