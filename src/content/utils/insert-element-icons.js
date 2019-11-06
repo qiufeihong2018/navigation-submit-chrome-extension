@@ -11,5 +11,6 @@
       url('${ window.chrome.extension.getURL('fonts/element-icons.ttf ')}') format('truetype'); /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
     }
   `
+  console.log(elementIcons)
   document.head.appendChild(elementIcons)
 })()

@@ -1,9 +1,11 @@
 /* eslint-disable */
 // 爬虫
 import $ from 'jquery'
-import {
-  isGithub
-} from './is'
+
+function isGithub () {
+  // eslint-disable-next-line no-useless-escape
+  return /^https:\/\/github.com\/[^\/]+\/[^\/]+$/.test(location.href)
+}
 
 export default function () {
   // 网站名称
